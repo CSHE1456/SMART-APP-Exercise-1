@@ -62,6 +62,31 @@
                     }
                 );
 
+                // Get Observations for the selected patient
+                client.request("/Observation?patient=" + client.patient.id, {
+                    resolveReferences: [ "observation" ],
+                    graph: true
+                })
+                
+                // Reject if no Observations are found
+                .then(function(data) {
+                    if (!data.entry || !data.entry.length) {
+                        throw new Error("No observation found for the selected patient");
+                    }
+                    return data.entry;
+                })
+                
+
+                // Render the current patient's observation (or any error)
+                .then(
+                    function(meds) {
+                        document.getElementById("observ").innerText = JSON.stringify(meds, null, 4);
+                    },
+                    function(error) {
+                        document.getElementById("observ").innerText = error.stack;
+                    }
+                );
+
             }).catch(console.error);
         </script>
     </body>
